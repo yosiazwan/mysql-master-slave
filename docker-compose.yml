@@ -20,6 +20,8 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
     ports:
       - "3308:3306"
     depends_on:
@@ -27,6 +29,7 @@ services:
     volumes:
       - ./slave/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./data/slave:/var/lib/mysql
+      - ./init/slave:/docker-entrypoint-initdb.d
 
   phpmyadmin-master:
     image: phpmyadmin/phpmyadmin

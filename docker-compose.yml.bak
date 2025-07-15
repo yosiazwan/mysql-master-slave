@@ -1,0 +1,103 @@
+services:
+  master:
+    image: mysql:5.7
+    container_name: mysql-master
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: testdb
+    volumes:
+      - ./data/master:/var/lib/mysql
+      - ./master/my.cnf:/etc/mysql/my.cnf
+    ports:
+      - "3307:3306"
+
+  phpmyadmin-master:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-master
+    restart: always
+    environment:
+      PMA_HOST: master
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "8007:80"
+    depends_on:
+      - master
+
+  slave1:
+    image: mysql:5.7
+    container_name: mysql-slave1
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - ./data/slave1:/var/lib/mysql
+      - ./slave1/my.cnf:/etc/mysql/my.cnf
+    ports:
+      - "3308:3306"
+    depends_on:
+      - master
+
+  phpmyadmin-slave1:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-slave1
+    restart: always
+    environment:
+      PMA_HOST: slave1
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "8008:80"
+    depends_on:
+      - slave1
+
+  slave2:
+    image: mysql:5.7
+    container_name: mysql-slave2
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - ./data/slave2:/var/lib/mysql
+      - ./slave2/my.cnf:/etc/mysql/my.cnf
+    ports:
+      - "3309:3306"
+    depends_on:
+      - master
+
+  phpmyadmin-slave2:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-slave2
+    restart: always
+    environment:
+      PMA_HOST: slave2
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "8009:80"
+    depends_on:
+      - slave2
+
+  slave3:
+    image: mysql:5.7
+    container_name: mysql-slave3
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - ./data/slave3:/var/lib/mysql
+      - ./slave3/my.cnf:/etc/mysql/my.cnf
+    ports:
+      - "3310:3306"
+    depends_on:
+      - master
+
+  phpmyadmin-slave3:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-slave3
+    restart: always
+    environment:
+      PMA_HOST: slave3
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "8010:80"
+    depends_on:
+      - slave3

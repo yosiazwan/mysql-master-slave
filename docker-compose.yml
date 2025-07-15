@@ -1,0 +1,53 @@
+services:
+  mysql-master:
+    image: mysql:8.0.36
+    container_name: mysql-master
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./master/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./data/master:/var/lib/mysql
+      - ./init/master:/docker-entrypoint-initdb.d
+
+  mysql-slave:
+    image: mysql:8.0.36
+    container_name: mysql-slave
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3308:3306"
+    depends_on:
+      - mysql-master
+    volumes:
+      - ./slave/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./data/slave:/var/lib/mysql
+
+  phpmyadmin-master:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-master
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql-master
+      PMA_PORT: 3306
+
+  phpmyadmin-slave:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-slave
+    restart: always
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: mysql-slave
+      PMA_PORT: 3306
+
+volumes:
+  master-data:
+  slave-data:

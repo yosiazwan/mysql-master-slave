@@ -29,7 +29,7 @@ CHANGE REPLICATION SOURCE TO
 
 START REPLICA;
 
-GRANT ALL PRIVILEGES ON *.* TO 'appuser'@'%' WITH GRANT OPTION;
+GRANT SELECT ON *.* TO 'appuser'@'%';
 FLUSH PRIVILEGES;
 
 -- (Opsional tapi direkomendasikan) Jadikan slave read-only sepenuhnya

@@ -9,8 +9,10 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${APP_USER}
-      MYSQL_PASSWORD: ${APP_PASSWORD}
+      APP_USER: ${APP_USER}
+      APP_PASSWORD: ${APP_PASSWORD}
+      REPL_USER: ${REPL_USER}
+      REPL_PASSWORD: ${REPL_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
@@ -31,6 +33,10 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      APP_USER: ${APP_USER}
+      APP_PASSWORD: ${APP_PASSWORD}
+      REPL_USER: ${REPL_USER}
+      REPL_PASSWORD: ${REPL_PASSWORD}
     depends_on:
       - mysql-master
     ports:
@@ -53,6 +59,10 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      APP_USER: ${APP_USER}
+      APP_PASSWORD: ${APP_PASSWORD}
+      REPL_USER: ${REPL_USER}
+      REPL_PASSWORD: ${REPL_PASSWORD}
     depends_on:
       - mysql-master
     ports:
@@ -73,6 +83,9 @@ services:
     image: proxysql/proxysql
     container_name: proxysql
     restart: always
+    environment:
+      APP_USER: ${APP_USER}
+      APP_PASSWORD: ${APP_PASSWORD}
     depends_on:
       - mysql-master
       - mysql-slave1

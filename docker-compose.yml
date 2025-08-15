@@ -1,35 +1,66 @@
+networks:
+  mysql-repl:
+
 services:
   mysql-master:
     image: mysql:8.0.36
     container_name: mysql-master
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: apppass
-    ports:
-      - "3307:3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      REPL_USER: ${REPL_USER}
+      REPL_PASSWORD: ${REPL_PASSWORD}
     volumes:
-      - ./master/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./data/master:/var/lib/mysql
+      - master-data:/var/lib/mysql
+      - ./master/my.cnf:/etc/mysql/conf.d/my.cnf:ro
       - ./init/master:/docker-entrypoint-initdb.d
+    networks:
+      - mysql-repl
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
 
-  mysql-slave:
+  mysql-slave1:
     image: mysql:8.0.36
-    container_name: mysql-slave
+    container_name: mysql-slave1
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: apppass
-    ports:
-      - "3308:3306"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      REPL_USER: ${REPL_USER}
+      REPL_PASSWORD: ${REPL_PASSWORD}
     depends_on:
       - mysql-master
     volumes:
-      - ./slave/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./data/slave:/var/lib/mysql
+      - slave1-data:/var/lib/mysql
+      - ./slave/my.cnf:/etc/mysql/conf.d/my.cnf:ro
       - ./init/slave:/docker-entrypoint-initdb.d
+    networks:
+      - mysql-repl
+
+  mysql-slave2:
+    image: mysql:8.0.36
+    container_name: mysql-slave2
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      REPL_USER: ${REPL_USER}
+      REPL_PASSWORD: ${REPL_PASSWORD}
+    depends_on:
+      - mysql-master
+    volumes:
+      - slave2-data:/var/lib/mysql
+      - ./slave/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+      - ./init/slave:/docker-entrypoint-initdb.d
+    networks:
+      - mysql-repl
 
   phpmyadmin-master:
     image: phpmyadmin/phpmyadmin
@@ -40,46 +71,31 @@ services:
     environment:
       PMA_HOST: mysql-master
       PMA_PORT: 3306
-
-  phpmyadmin-slave:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin-slave
-    restart: always
-    ports:
-      - "8082:80"
-    environment:
-      PMA_HOST: mysql-slave
-      PMA_PORT: 3306
+    networks:
+      - mysql-repl
 
   proxysql:
     image: proxysql/proxysql
     container_name: proxysql
     restart: always
-    ports:
-      - "6032:6032"
-      - "6033:6033"
     depends_on:
       - mysql-master
-      - mysql-slave
+      - mysql-slave1
+      - mysql-slave2
+    ports:
+      - "6032:6032"  # admin
+      - "3306:6033"  # client
     volumes:
-      - ./init/proxysql/init.sql:/init.sql
-    command: >
-      /bin/bash -c '
-        /usr/bin/proxysql --initial &
-
-        for i in {1..10}; do
-          echo "⌛ Waiting for ProxySQL to be ready ($i)..."
-          sleep 3
-          mysql -u admin -padmin -h 127.0.0.1 -P6032 -e "SELECT 1" && break
-        done
-
-        echo "🚀 Running init.sql"
-        mysql -u admin -padmin -h 127.0.0.1 -P6032 < /init.sql || true
-
-        tail -f /dev/null
-      '
+      - proxysql-data:/var/lib/proxysql
+      - ./init/proxysql:/init/proxysql:ro
+    entrypoint: /init/proxysql/entrypoint.sh
+    env_file:
+      - .env
+    networks:
+      - mysql-repl
 
 volumes:
   master-data:
-  slave-data:
+  slave1-data:
+  slave2-data:
   proxysql-data:

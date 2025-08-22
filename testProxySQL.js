@@ -3,8 +3,8 @@ const mysql = require('mysql2/promise');
 const config = {
   host: '127.0.0.1',
   port: 6033, // ProxySQL port
-  user: 'appuser',
-  password: 'apppass',
+  user: 'user',
+  password: 'user',
   database: 'test',
 };
 

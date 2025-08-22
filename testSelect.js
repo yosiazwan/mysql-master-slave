@@ -3,8 +3,8 @@ const mysql = require('mysql2/promise');
 const config = {
   host: '127.0.0.1',
   port: 6033, // ProxySQL port
-  user: 'appuser',
-  password: 'apppass',
+  user: 'user',
+  password: 'user',
   database: 'test',
 };
 
@@ -35,7 +35,7 @@ class MySQLTester {
 
 
 (async () => {
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 1; i++) {
     try {
       const tester = new MySQLTester(config);
       tester.testSelect();

@@ -8,7 +8,7 @@ VALUES
 -- Users (envsubst akan ganti)
 INSERT INTO mysql_users(username, password, default_hostgroup, transaction_persistent)
 VALUES
-  ('${APP_USER}', '${APP_PASSWORD}', 0, 1);
+  ('user', 'user', 0, 1);
 
 -- Query routing
 INSERT INTO mysql_query_rules (rule_id, active, match_pattern, destination_hostgroup, apply)

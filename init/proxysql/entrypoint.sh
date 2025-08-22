@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+apt-get update && apt-get install -y gettext-base
+
 # Generate init.sql dari template
 envsubst < /init/proxysql/init.sql.template > /init/proxysql/init.sql
 

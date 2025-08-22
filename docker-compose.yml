@@ -82,7 +82,7 @@ services:
       - mysql-slave2
     ports:
       - "6032:6032"  # admin
-      - "6033:6033"  # client
+      - "3306:6033"  # client
     volumes:
       - proxysql-data:/var/lib/proxysql
       - ./init/proxysql:/init/proxysql

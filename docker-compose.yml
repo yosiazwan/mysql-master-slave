@@ -93,16 +93,27 @@ services:
       - cakephp-network
 
   phpmyadmin-master:
-    image: phpmyadmin/phpmyadmin
+    image: phpmyadmin:latest
     container_name: phpmyadmin-master
     restart: always
-    ports:
-      - "8080:80"
     environment:
       PMA_HOST: mysql-master
       PMA_PORT: 3306
     networks:
       - cakephp-network
+  nginx:
+    image: nginx:latest
+    container_name: nginx_4phpmyadmin
+    ports:
+      - "8080:443"
+    volumes:
+      - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - phpmyadmin-master
+    networks:
+      - cakephp-network
+    restart: always
 
 volumes:
   master-data:

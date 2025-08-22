@@ -11,10 +11,10 @@ echo "[INFO] Membuat user replikasi dan app user..."
 
 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" <<EOF
 -- Replication user
-CREATE USER IF NOT EXISTS '${REPL_USER}'@'%' IDENTIFIED WITH mysql_native_password BY '${REPL_PASSWORD}';
+CREATE USER IF NOT EXISTS '${REPL_USER}'@'%' IDENTIFIED WITH caching_sha2_password BY '${REPL_PASSWORD}';
 GRANT REPLICATION SLAVE ON *.* TO '${REPL_USER}'@'%';
 
-CREATE USER '${APP_USER}'@'%' IDENTIFIED BY '${APP_PASSWORD}';
+CREATE USER IF NOT EXISTS '${APP_USER}'@'%' IDENTIFIED WITH caching_sha2_password BY '${APP_PASSWORD}';
 GRANT ALL PRIVILEGES ON *.* TO '${APP_USER}'@'%';
 
 FLUSH PRIVILEGES;
